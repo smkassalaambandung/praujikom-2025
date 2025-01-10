@@ -4,8 +4,8 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Event;
-use Illuminate\Http\Request;
 use Exception;
+use Illuminate\Http\Request;
 
 class EventController extends Controller
 {
@@ -16,6 +16,7 @@ class EventController extends Controller
     {
         try {
             $events = Event::all();
+
             return response()->json(['events' => $events], 200);
         } catch (Exception $e) {
             return response()->json(['message' => 'Failed to fetch events', 'error' => $e->getMessage()], 500);
