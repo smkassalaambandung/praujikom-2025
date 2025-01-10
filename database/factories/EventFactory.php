@@ -17,7 +17,11 @@ class EventFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'name' => 'pesta rakyat ' . fake()->country(),
+            'description' => fake()->sentence(),
+            'event_date' => fake()->dateTime(),
+            'location' => fake()->country(),
+            'user_id' => fake()->numberBetween(1, 100),
         ];
     }
 }

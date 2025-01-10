@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\Event;
 use Illuminate\Http\Request;
+use Exception;
 
 class EventController extends Controller
 {
@@ -13,9 +14,12 @@ class EventController extends Controller
      */
     public function index()
     {
-        $events = Event::all();
-
-        return response()->json(['events' => $events], 200);
+        try {
+            $events = Event::all();
+            return response()->json(['events' => $events], 200);
+        } catch (Exception $e) {
+            return response()->json(['message' => 'Failed to fetch events', 'error' => $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -31,15 +35,19 @@ class EventController extends Controller
      */
     public function store(Request $request)
     {
-        $event = new Event;
-        $event->name = $request->name;
-        $event->description = $request->description;
-        $event->date = $request->date;
-        $event->location = $request->location;
-        $event->user_id = $request->user_id;
-        $event->save();
+        try {
+            $event = new Event;
+            $event->name = $request->name;
+            $event->description = $request->description;
+            $event->date = $request->date;
+            $event->location = $request->location;
+            $event->user_id = $request->user_id;
+            $event->save();
 
-        return response()->json(['message' => 'Event created successfully', 'event' => $event], 201);
+            return response()->json(['message' => 'Event created successfully', 'event' => $event], 201);
+        } catch (Exception $e) {
+            return response()->json(['message' => 'Failed to create event', 'error' => $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -47,7 +55,11 @@ class EventController extends Controller
      */
     public function show(Event $event)
     {
-        return response()->json(['event' => $event], 200);
+        try {
+            return response()->json(['event' => $event], 200);
+        } catch (Exception $e) {
+            return response()->json(['message' => 'Failed to fetch event', 'error' => $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -63,14 +75,18 @@ class EventController extends Controller
      */
     public function update(Request $request, Event $event)
     {
-        $event->name = $request->name;
-        $event->description = $request->description;
-        $event->date = $request->date;
-        $event->location = $request->location;
-        $event->user_id = $request->user_id;
-        $event->save();
+        try {
+            $event->name = $request->name;
+            $event->description = $request->description;
+            $event->date = $request->date;
+            $event->location = $request->location;
+            $event->user_id = $request->user_id;
+            $event->save();
 
-        return response()->json(['message' => 'Event update successfully', 'event' => $event], 201);
+            return response()->json(['message' => 'Event updated successfully', 'event' => $event], 200);
+        } catch (Exception $e) {
+            return response()->json(['message' => 'Failed to update event', 'error' => $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -78,12 +94,16 @@ class EventController extends Controller
      */
     public function destroy($id)
     {
-        $event = Event::find($id);
-        if (! $event) {
-            return response()->json(['message' => 'Event not found'], 404);
-        }
-        $event->delete();
+        try {
+            $event = Event::find($id);
+            if (! $event) {
+                return response()->json(['message' => 'Event not found'], 404);
+            }
+            $event->delete();
 
-        return response()->json(['message' => 'Event deleted successfully'], 200);
+            return response()->json(['message' => 'Event deleted successfully'], 200);
+        } catch (Exception $e) {
+            return response()->json(['message' => 'Failed to delete event', 'error' => $e->getMessage()], 500);
+        }
     }
 }
