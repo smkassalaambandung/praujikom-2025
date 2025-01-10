@@ -13,7 +13,8 @@ class EventController extends Controller
      */
     public function index()
     {
-        //
+        $events = Event::all();
+        return response()->json(['events' => $events], 200);
     }
 
     /**
@@ -44,7 +45,7 @@ class EventController extends Controller
      */
     public function show(Event $event)
     {
-        //
+        return response()->json(['event' => $event], 200);
     }
 
     /**
