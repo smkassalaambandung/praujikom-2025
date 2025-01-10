@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Laravolt\Avatar\Avatar;
 
 class User extends Authenticatable
 {
@@ -24,6 +25,8 @@ class User extends Authenticatable
         'password',
     ];
 
+    protected $appends = ['avatar'];
+
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -37,6 +40,14 @@ class User extends Authenticatable
     public function event()
     {
         return $this->hasMany(Event::class);
+    }
+
+    public function getAvatarAttribute()
+    {
+        $user = User::find(Auth()->user()->id);
+        $avatar = new Avatar;
+
+        return $user ? $avatar->create($user->name)->toBase64() : $avatar->create('Unknown')->toBase64();
     }
 
     /**

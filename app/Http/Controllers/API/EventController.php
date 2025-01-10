@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Event;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class EventController extends Controller
 {
@@ -15,7 +16,7 @@ class EventController extends Controller
     public function index()
     {
         try {
-            $events = Event::all();
+            $events = Event::latest()->get();
 
             return response()->json(['events' => $events], 200);
         } catch (Exception $e) {
@@ -54,10 +55,13 @@ class EventController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Event $event)
+    public function show($id)
     {
         try {
-            return response()->json(['event' => $event], 200);
+            $event = Event::findOrFail($id);
+            return response()->json($event, 200);
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['message' => 'Event not found'], 404);
         } catch (Exception $e) {
             return response()->json(['message' => 'Failed to fetch event', 'error' => $e->getMessage()], 500);
         }

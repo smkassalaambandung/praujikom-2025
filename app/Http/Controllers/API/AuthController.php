@@ -17,9 +17,12 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
-            $token = $user->createToken('authToken')->accessToken;
+            $token = $user->createToken('authToken')->plainTextToken;
 
-            return response()->json(['token' => $token], 200);
+            return response()->json([
+                'user' => $user,
+                'token' => $token,
+            ], 200);
         } else {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
@@ -43,9 +46,15 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        $token = $user->createToken('authToken')->accessToken;
+        $token = $user->createToken('authToken')->plainTextToken;
+        return response()->json([
+            'token' => $token,
+        ], 201);
+    }
 
-        return response()->json(['token' => $token], 201);
+    public function profile()
+    {
+        return response()->json(Auth()->user(), 200);
     }
 
     public function logout(Request $request)
