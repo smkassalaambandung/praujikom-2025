@@ -7,6 +7,7 @@ use App\Models\Event;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Auth;
 
 class EventController extends Controller
 {
@@ -19,6 +20,19 @@ class EventController extends Controller
             $events = Event::latest()->get();
 
             return response()->json(['events' => $events], 200);
+        } catch (Exception $e) {
+            return response()->json(['message' => 'Failed to fetch events', 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function yourEvent()  {
+        try {
+            $events = Event::where('user_id', Auth::user()->id)->latest()->get();
+            if ($events->count() > 0) {
+                return response()->json(['events' => $events], 200);
+            } else{
+                return response()->json(['message' => 'event not found'], 404);
+            }
         } catch (Exception $e) {
             return response()->json(['message' => 'Failed to fetch events', 'error' => $e->getMessage()], 500);
         }

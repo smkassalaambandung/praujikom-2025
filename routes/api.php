@@ -10,5 +10,6 @@ Route::post('logout', [AuthController::class, 'logout'])->middleware('auth:sanct
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('profile', [AuthController::class, 'profile']);
+    Route::get('your-event', [EventController::class, 'yourEvent']);
     Route::apiResource('events', EventController::class);
 });
