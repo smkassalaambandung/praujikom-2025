@@ -55,7 +55,7 @@ class EventController extends Controller
             $event = new Event;
             $event->name = $request->name;
             $event->description = $request->description;
-            $event->date = $request->date;
+            $event->event_date = $request->event_date;
             $event->location = $request->location;
             $event->user_id = Auth::user()->id;
             $event->save();
@@ -97,7 +97,7 @@ class EventController extends Controller
         try {
             $event->name = $request->name;
             $event->description = $request->description;
-            $event->date = $request->date;
+            $event->event_date = $request->event_date;
             $event->location = $request->location;
             $event->save();
 
