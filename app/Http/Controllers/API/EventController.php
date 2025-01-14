@@ -28,11 +28,7 @@ class EventController extends Controller
     public function yourEvent()  {
         try {
             $events = Event::where('user_id', Auth::user()->id)->latest()->get();
-            if ($events->count() > 0) {
-                return response()->json(['events' => $events], 200);
-            } else{
-                return response()->json(['message' => 'event not found'], 404);
-            }
+            return response()->json(['events' => $events], 200);
         } catch (Exception $e) {
             return response()->json(['message' => 'Failed to fetch events', 'error' => $e->getMessage()], 500);
         }
