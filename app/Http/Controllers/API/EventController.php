@@ -99,6 +99,7 @@ class EventController extends Controller
             $event->description = $request->description;
             $event->event_date = $request->event_date;
             $event->location = $request->location;
+            $event->user_id = Auth::user()->id;
             $event->save();
 
             return response()->json(['message' => 'Event updated successfully', 'event' => $event], 200);
