@@ -19,7 +19,7 @@ class EventFactory extends Factory
         return [
             'name' => 'pesta rakyat ' . fake()->country(),
             'description' => fake()->sentence(),
-            'event_date' => fake()->dateTime(),
+            'event_date' => fake()->date(),
             'location' => fake()->country(),
             'user_id' => fake()->numberBetween(1, 100),
         ];

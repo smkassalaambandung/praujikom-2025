@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->text('description')->nullable();
-            $table->dateTime('event_date');
+            $table->date('event_date');
             $table->string('location')->nullable();
             $table->unsignedBigInteger('user_id');
             $table->timestamps();
