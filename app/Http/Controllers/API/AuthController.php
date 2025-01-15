@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
@@ -59,10 +60,23 @@ class AuthController extends Controller
         return response()->json(Auth()->user(), 200);
     }
 
-    public function logout(Request $request)
+    public function logout()
     {
-        $request->user()->token()->revoke();
+        // $request->user()->token()->revoke();
 
+        // return response()->json(['message' => 'Successfully logged out'], 200);
+        $user = Auth::guard('sanctum')->user();
+
+        if (!$user) {
+            return response()->json(['error' => 'Unauthenticated'], 401);
+        }
+
+        try {
+            $user->tokens()->delete();
+        } catch (\Exception $e) {
+            Log::error('Token revocation failed: ' . $e->getMessage());
+            return response()->json(['error' => 'Unable to revoke tokens'], 500);
+        }
         return response()->json(['message' => 'Successfully logged out'], 200);
     }
 }
