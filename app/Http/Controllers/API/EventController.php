@@ -8,6 +8,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 
 class EventController extends Controller
 {
@@ -46,21 +47,30 @@ class EventController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {
-        try {
-            $event = new Event;
-            $event->name = $request->name;
-            $event->description = $request->description;
-            $event->event_date = $request->event_date;
-            $event->location = $request->location;
-            $event->user_id = Auth::user()->id;
-            $event->save();
+{
+    try {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'event_date' => 'required|date',
+            'location' => 'required|string|max:255'
+        ]);
 
-            return response()->json(['message' => 'Event created successfully', 'event' => $event], 201);
-        } catch (Exception $e) {
-            return response()->json(['message' => 'Failed to create event', 'error' => $e->getMessage()], 500);
-        }
+        $event = new Event;
+        $event->name = $validated['name'];
+        $event->description = $validated['description'];
+        $event->event_date = $validated['event_date'];
+        $event->location = $validated['location'];
+        $event->user_id = Auth::user()->id;
+        $event->save();
+
+        return response()->json(['message' => 'Event created successfully', 'event' => $event], 201);
+    } catch (ValidationException $e) {
+        return response()->json(['message' => 'Validation failed', 'errors' => $e->errors()], 422);
+    } catch (Exception $e) {
+        return response()->json(['message' => 'Failed to create event', 'error' => $e->getMessage()], 500);
     }
+}
 
     /**
      * Display the specified resource.
@@ -91,17 +101,29 @@ class EventController extends Controller
     public function update(Request $request, Event $event)
     {
         try {
-            $event->name = $request->name;
-            $event->description = $request->description;
-            $event->event_date = $request->event_date;
-            $event->location = $request->location;
+            // Validasi data input
+            $validatedData = $request->validate([
+                'name' => 'required|string|max:255',
+                'description' => 'required|string|max:1000',
+                'event_date' => 'required|date|after_or_equal:today',
+                'location' => 'required|string|max:255',
+            ]);
+            $event->name = $validatedData['name'];
+            $event->description = $validatedData['description'];
+            $event->event_date = $validatedData['event_date'];
+            $event->location = $validatedData['location'];
             $event->user_id = Auth::user()->id;
             $event->save();
 
             return response()->json(['message' => 'Event updated successfully', 'event' => $event], 200);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Tangani error validasi
+            return response()->json(['message' => 'Validation error', 'errors' => $e->errors()], 422);
         } catch (Exception $e) {
+            // Tangani error lainnya
             return response()->json(['message' => 'Failed to update event', 'error' => $e->getMessage()], 500);
         }
+
     }
 
     /**

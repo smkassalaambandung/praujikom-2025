@@ -39,7 +39,7 @@ class AuthController extends Controller
 
         if ($validator->fails()) {
             $errors = $validator->errors()->toArray();
-            $firstError = reset($errors)[0]; // Ambil pesan error pertama
+            $firstError = reset($errors)[0];
             return response()->json(['error' => $firstError], 400);
         }
 
