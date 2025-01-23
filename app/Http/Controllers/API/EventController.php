@@ -26,7 +26,8 @@ class EventController extends Controller
         }
     }
 
-    public function yourEvent()  {
+    public function yourEvent()
+    {
         try {
             $events = Event::where('user_id', Auth::user()->id)->latest()->get();
             return response()->json(['events' => $events], 200);
@@ -47,30 +48,34 @@ class EventController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-{
-    try {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'required|string',
-            'event_date' => 'required|date',
-            'location' => 'required|string|max:255'
-        ]);
+    {
+        try {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'description' => 'required|string',
+                'event_date' => 'required|date',
+                'location' => 'required|string|max:255'
+            ]);
 
-        $event = new Event;
-        $event->name = $validated['name'];
-        $event->description = $validated['description'];
-        $event->event_date = $validated['event_date'];
-        $event->location = $validated['location'];
-        $event->user_id = Auth::user()->id;
-        $event->save();
+            $event = new Event;
+            $event->name = $validated['name'];
+            $event->description = $validated['description'];
+            $event->event_date = $validated['event_date'];
+            $event->location = $validated['location'];
+            $event->user_id = Auth::user()->id;
+            $event->save();
 
-        return response()->json(['message' => 'Event created successfully', 'event' => $event], 201);
-    } catch (ValidationException $e) {
-        return response()->json(['message' => 'Validation failed', 'errors' => $e->errors()], 422);
-    } catch (Exception $e) {
-        return response()->json(['message' => 'Failed to create event', 'error' => $e->getMessage()], 500);
+            return response()->json(['message' => 'Event created successfully', 'event' => $event], 201);
+        } catch (ValidationException $e) {
+            // Ambil satu error pertama dari daftar errors
+            $errors = $e->errors();
+            $firstError = array_values($errors)[0][0]; // Mengambil error pertama
+
+            return response()->json(['message' => 'Validation failed', 'error' => $firstError], 422);
+        } catch (Exception $e) {
+            return response()->json(['message' => 'Failed to create event', 'error' => $e->getMessage()], 500);
+        }
     }
-}
 
     /**
      * Display the specified resource.
@@ -117,13 +122,15 @@ class EventController extends Controller
 
             return response()->json(['message' => 'Event updated successfully', 'event' => $event], 200);
         } catch (\Illuminate\Validation\ValidationException $e) {
-            // Tangani error validasi
-            return response()->json(['message' => 'Validation error', 'errors' => $e->errors()], 422);
+            // Ambil satu error pertama dari daftar errors
+            $errors = $e->errors();
+            $firstError = array_values($errors)[0][0]; // Mengambil error pertama
+
+            return response()->json(['message' => 'Validation error', 'error' => $firstError], 422);
         } catch (Exception $e) {
             // Tangani error lainnya
             return response()->json(['message' => 'Failed to update event', 'error' => $e->getMessage()], 500);
         }
-
     }
 
     /**
