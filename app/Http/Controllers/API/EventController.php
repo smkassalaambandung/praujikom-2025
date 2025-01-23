@@ -5,8 +5,8 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\Event;
 use Exception;
-use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
@@ -30,6 +30,7 @@ class EventController extends Controller
     {
         try {
             $events = Event::where('user_id', Auth::user()->id)->latest()->get();
+
             return response()->json(['events' => $events], 200);
         } catch (Exception $e) {
             return response()->json(['message' => 'Failed to fetch events', 'error' => $e->getMessage()], 500);
@@ -54,7 +55,7 @@ class EventController extends Controller
                 'name' => 'required|string|max:255',
                 'description' => 'required|string',
                 'event_date' => 'required|date',
-                'location' => 'required|string|max:255'
+                'location' => 'required|string|max:255',
             ]);
 
             $event = new Event;
@@ -67,9 +68,9 @@ class EventController extends Controller
 
             return response()->json(['message' => 'Event created successfully', 'event' => $event], 201);
         } catch (ValidationException $e) {
-            // Ambil satu error pertama dari daftar errors
+
             $errors = $e->errors();
-            $firstError = array_values($errors)[0][0]; // Mengambil error pertama
+            $firstError = array_values($errors)[0][0];
 
             return response()->json(['message' => 'Validation failed', 'error' => $firstError], 422);
         } catch (Exception $e) {
@@ -84,6 +85,7 @@ class EventController extends Controller
     {
         try {
             $event = Event::findOrFail($id);
+
             return response()->json($event, 200);
         } catch (ModelNotFoundException $e) {
             return response()->json(['message' => 'Event not found'], 404);
@@ -106,7 +108,6 @@ class EventController extends Controller
     public function update(Request $request, Event $event)
     {
         try {
-            // Validasi data input
             $validatedData = $request->validate([
                 'name' => 'required|string|max:255',
                 'description' => 'required|string|max:1000',
@@ -122,13 +123,11 @@ class EventController extends Controller
 
             return response()->json(['message' => 'Event updated successfully', 'event' => $event], 200);
         } catch (\Illuminate\Validation\ValidationException $e) {
-            // Ambil satu error pertama dari daftar errors
             $errors = $e->errors();
-            $firstError = array_values($errors)[0][0]; // Mengambil error pertama
+            $firstError = array_values($errors)[0][0];
 
             return response()->json(['message' => 'Validation error', 'error' => $firstError], 422);
         } catch (Exception $e) {
-            // Tangani error lainnya
             return response()->json(['message' => 'Failed to update event', 'error' => $e->getMessage()], 500);
         }
     }
